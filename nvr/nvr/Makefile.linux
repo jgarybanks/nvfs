@@ -1,0 +1,20 @@
+LINUXSRC = /lib/modules/$(shell uname -r)/build
+TOPINC = -I${LINUXSRC}/include
+
+CC	= gcc
+EXTRA_CFLAGS += -I. -I.. ${TOPINC} ${EXTRACFLAGS} -O2 -Wall -Wno-unused -fno-strict-aliasing
+UCFLAGS = -I. ${TOPINC} -g -O2 -Wall -Wno-unused # -Werror
+
+obj-m := nvr.o
+nvr-objs :=    nvr.o  nvr_device.o  nvr_main.o  nvr_queue.o
+
+all:
+	make -C ${LINUXSRC} SUBDIRS=$(PWD) modules
+
+nvr.o: ${nvr-objs}
+
+clean:
+	rm -f ${obj-m:.o=.ko} ${nvfs-objs} *.d .*.o.cmd .*.flags \#* *~
+	rm -f Module.symvers nvr.mod* *.o
+
+# ${nvr-objs}: nvr.o nvr_device.o nvr_queue.o nvr_main.o
